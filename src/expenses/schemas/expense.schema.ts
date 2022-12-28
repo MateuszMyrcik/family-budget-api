@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import {
-  Cost,
+  Amount,
   GroupCategory,
   Metadata,
   Ownership,
@@ -25,7 +25,7 @@ export class Expense {
   name: string;
 
   @Prop({ type: Object, required: true })
-  cost: Cost;
+  amount: Amount;
 
   @Prop({ type: Object, required: true })
   ownership: Ownership;

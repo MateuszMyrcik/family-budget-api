@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult, UpdateResult } from 'mongodb';
 import { Model } from 'mongoose';
-import { UniqueID } from 'src/domain-types/shared';
+import { UniqueId } from 'src/domain-types/shared';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { Expense, ExpenseDocument } from './schemas/expense.schema';
@@ -22,18 +22,18 @@ export class ExpensesService {
     return this.expenseModel.find().exec();
   }
 
-  async findOne(id: UniqueID): Promise<Expense> {
+  async findOne(id: UniqueId): Promise<Expense> {
     return this.expenseModel.findOne({ _id: id });
   }
 
   async update(
-    id: UniqueID,
+    id: UniqueId,
     updateExpenseDto: UpdateExpenseDto,
   ): Promise<UpdateResult> {
     return this.expenseModel.updateOne(updateExpenseDto);
   }
 
-  async remove(id: UniqueID): Promise<DeleteResult> {
+  async remove(id: UniqueId): Promise<DeleteResult> {
     return this.expenseModel.deleteOne({ _id: id });
   }
 }

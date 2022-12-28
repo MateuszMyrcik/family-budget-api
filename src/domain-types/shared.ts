@@ -1,1 +1,1 @@
-export type UniqueID = string;
+export type UniqueId = string;
