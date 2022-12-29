@@ -32,7 +32,7 @@ export type Image = {
 // EXPENSES
 export type Expense = {
   cyclic: boolean;
-  groupCategory: GroupCategory;
+  groupCategory: string | ExpenseGroupCategory;
   category: string;
   name: string;
   amount: Amount;
@@ -41,7 +41,7 @@ export type Expense = {
   rangeDate?: RangeDate;
 };
 
-export type GroupCategory =
+export type ExpenseGroupCategory =
   | 'FOOD'
   | 'OTHER'
   | 'HYGIENE'
@@ -57,10 +57,21 @@ export type GroupCategory =
   | 'TELECOMMUNICATIONS';
 
 // INCOME
+export type IncomeGroupCategory = 'SALARY' | 'INVESTMENTS' | 'OTHER';
+
+export type IncomeCategory =
+  | 'FULL_TIME'
+  | 'PART_TIME'
+  | 'FREELANCE'
+  | 'RENTAL_INCOME'
+  | 'INTEREST'
+  | 'DIVIDENDS'
+  | 'OTHER';
+
 export type Income = {
   cyclic: boolean;
-  groupCategory: GroupCategory;
-  category: string;
+  groupCategory: ExpenseGroupCategory;
+  category: string | IncomeCategory;
   name: string;
   amount: Amount;
   ownership: Ownership;
