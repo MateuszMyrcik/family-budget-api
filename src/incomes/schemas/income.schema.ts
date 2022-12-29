@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import {
   Amount,
-  ExpenseGroupCategory,
+  IncomeGroupCategory,
   Metadata,
   Ownership,
   RangeDate,
@@ -16,7 +16,7 @@ export class Income {
   cyclic: boolean;
 
   @Prop({ required: true })
-  groupCategory: ExpenseGroupCategory;
+  groupCategory: IncomeGroupCategory;
 
   @Prop({ required: true, enum: ['FULL_TIME'] })
   category: 'FULL_TIME' | string;
