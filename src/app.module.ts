@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ExpensesModule } from './expenses/expenses.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { IncomesModule } from './incomes/incomes.module';
+import { UsersModule } from './users/users.module';
 
 const DB_PASSWORD = process.env.DB_PASSWORD; // TODO: adjust to production
 
@@ -14,6 +15,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD; // TODO: adjust to production
       `mongodb+srv://mati:${DB_PASSWORD}@cluster0.gs8zv.mongodb.net/family_budget?retryWrites=true&w=majority`,
     ),
     IncomesModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

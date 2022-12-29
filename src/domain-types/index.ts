@@ -101,7 +101,7 @@ export type User = {
   role: UserRole;
 };
 
-export type Family = {
+export type Household = {
   id: string;
   primaryMember: User;
   otherMembers?: User[];
