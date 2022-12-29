@@ -8,18 +8,18 @@ import {
   RangeDate,
 } from 'src/domain-types';
 
-export type ExpenseDocument = HydratedDocument<Expense>;
+export type IncomeDocument = HydratedDocument<Income>;
 
 @Schema()
-export class Expense {
+export class Income {
   @Prop({ required: true })
   cyclic: boolean;
 
   @Prop({ required: true })
   groupCategory: ExpenseGroupCategory;
 
-  @Prop({ required: true, enum: ['POWER', 'GROCERIES'] })
-  category: 'POWER' | string;
+  @Prop({ required: true, enum: ['FULL_TIME'] })
+  category: 'FULL_TIME' | string;
 
   @Prop({ required: true })
   name: string;
@@ -37,4 +37,4 @@ export class Expense {
   rangeDate?: RangeDate;
 }
 
-export const ExpenseSchema = SchemaFactory.createForClass(Expense);
+export const IncomeSchema = SchemaFactory.createForClass(Income);
