@@ -1,13 +1,11 @@
-import { User } from '..';
+import { UserInfo } from '../fe-shared/domain';
 
-export const MOCKED_USER: User = {
+export const MOCKED_USER: UserInfo = {
   id: '1',
   name: 'John',
   surname: 'Doe',
   email: 'john.doe@gmail.com',
-  avatar: {
-    alt: 'John Doe Picture',
-    url: 'https://www.pngkit.com/png/detail/911-9115516_avatar-icon-deadpool.png',
-  },
+  groupId: '1',
+  avatarUrl: 'https://i.pravatar.cc/300',
   role: 'ADMIN',
 };

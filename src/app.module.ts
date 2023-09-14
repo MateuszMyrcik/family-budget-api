@@ -1,20 +1,25 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ExpensesModule } from './expenses/expenses.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { IncomesModule } from './incomes/incomes.module';
+import { AuthzModule } from './authz/authz.module';
+import { TransactionsModule } from './transactions/transactions.module';
+
+import { UserInfoModule } from './user-info/user-info.module';
+import { UserGroupsModule } from './user-groups/user-groups.module';
 import { UsersModule } from './users/users.module';
 
-const DB_PASSWORD = process.env.DB_PASSWORD; // TODO: adjust to production
+const DB_PASSWORD = process.env.DB_PASSWORD || '';
 
 @Module({
   imports: [
-    ExpensesModule,
     MongooseModule.forRoot(
       `mongodb+srv://mati:${DB_PASSWORD}@cluster0.gs8zv.mongodb.net/family_budget?retryWrites=true&w=majority`,
     ),
-    IncomesModule,
+    TransactionsModule,
+    AuthzModule,
+    UserInfoModule,
+    UserGroupsModule,
     UsersModule,
   ],
   controllers: [AppController],

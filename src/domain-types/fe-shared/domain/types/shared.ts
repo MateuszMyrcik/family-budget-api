@@ -1,4 +1,5 @@
 import { UniqueId } from '../common';
+import { USER_ROLES } from '../constants/user-info';
 import { ExpenseCategory } from './expense';
 
 // SHARED DOMAIN TYPES
@@ -73,6 +74,11 @@ export type IncomeDetails = {
 
 export type TransactionType = 'EXPENSE' | 'INCOME';
 
+export enum TransactionTypeEnum {
+  EXPENSE = 'EXPENSE',
+  INCOME = 'INCOME',
+}
+
 // EXPENSES
 export type ExpenseGroupCategory =
   | 'SHOPPING'
@@ -112,19 +118,22 @@ export type BudgetCategoryRecord = {
 };
 
 // USERS
-export type UserRole = 'ADMIN' | 'REGULAR';
+export type UserRole = typeof USER_ROLES[number];
 
-export type User = {
+export type UserInfo = {
   id: string;
   name: string;
-  surname: string;
-  avatar?: Image;
-  email: string;
   role: UserRole;
+  email: string;
+  groupId: string;
+  surname: string;
+  avatarUrl?: string;
 };
 
 export type Household = {
   id: string;
-  primaryMember: User;
-  otherMembers?: User[];
+  primaryMember: UserInfo;
+  otherMembers?: UserInfo[];
 };
+
+export type UserInfoResponse = UserInfo;
