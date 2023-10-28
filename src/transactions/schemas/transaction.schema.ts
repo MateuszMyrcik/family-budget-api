@@ -4,8 +4,8 @@ import {
   Amount,
   TRANSACTION_TYPES,
   TransactionType,
-} from 'src/domain-types/fe-shared/domain';
-import { UniqueId } from 'src/domain-types/shared';
+  UniqueId,
+} from 'src/shared';
 
 export type TransactionDocument = HydratedDocument<Transaction>;
 

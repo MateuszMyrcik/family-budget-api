@@ -11,10 +11,10 @@ import {
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { UniqueId } from 'src/domain-types/shared';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './user.decorator';
 import { UserRequestInfo } from './user.type';
+import { UniqueId } from 'src/shared/commonTypes';
 
 @Controller('transactions')
 export class TransactionsController {

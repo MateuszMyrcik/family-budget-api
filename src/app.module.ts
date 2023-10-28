@@ -4,8 +4,6 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthzModule } from './authz/authz.module';
 import { TransactionsModule } from './transactions/transactions.module';
-
-import { UserInfoModule } from './user-info/user-info.module';
 import { UserGroupsModule } from './user-groups/user-groups.module';
 import { UsersModule } from './users/users.module';
 
@@ -18,7 +16,6 @@ const DB_PASSWORD = process.env.DB_PASSWORD || '';
     ),
     TransactionsModule,
     AuthzModule,
-    UserInfoModule,
     UserGroupsModule,
     UsersModule,
   ],

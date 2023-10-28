@@ -1,6 +1,4 @@
-import { UniqueId } from '../common';
-import { USER_ROLES } from '../constants/user-info';
-import { ExpenseCategory } from './expense';
+import { UniqueId } from '../../commonTypes';
 
 // SHARED DOMAIN TYPES
 export type Ownership = {
@@ -58,7 +56,7 @@ export type TransactionCategory = {
 
 export type ExpenseDetails = {
   groupCategory: ExpenseGroupCategory | string;
-  category: ExpenseCategory | string;
+  category: string;
   groupCategoryLabel: string;
   categoryLabel: string;
   type: 'EXPENSE';
@@ -116,24 +114,3 @@ export type BudgetCategoryRecord = {
   plannedTotal: number;
   actualTotal: number;
 };
-
-// USERS
-export type UserRole = typeof USER_ROLES[number];
-
-export type UserInfo = {
-  id: string;
-  name: string;
-  role: UserRole;
-  email: string;
-  groupId: string;
-  surname: string;
-  avatarUrl?: string;
-};
-
-export type Household = {
-  id: string;
-  primaryMember: UserInfo;
-  otherMembers?: UserInfo[];
-};
-
-export type UserInfoResponse = UserInfo;

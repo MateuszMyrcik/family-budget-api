@@ -1,4 +1,4 @@
-import { UniqueId } from 'src/domain-types/shared';
+import { UniqueId } from 'src/shared';
 
 export class CreateUserDto {
   readonly id: UniqueId;

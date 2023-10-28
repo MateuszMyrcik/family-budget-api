@@ -3,7 +3,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model } from 'mongoose';
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { UniqueId, UserInfoResponse } from 'src/shared';
 
 @Injectable()
 export class UsersService {
@@ -24,19 +29,30 @@ export class UsersService {
     return createdUser.save();
   }
 
+  async findOne(id: UniqueId): Promise<UserInfoResponse> {
+    const user = await this.userModel.findOne({ id }).exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { email, groupId } = user.toObject({
+      versionKey: false,
+    });
+
+    return {
+      id,
+      email,
+      groupId: groupId || null,
+    };
+  }
+
   findAll() {
     return this.userModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: UniqueId, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { USER_ROLES, UserRole } from 'src/domain-types/fe-shared/domain';
-import { UniqueId } from 'src/domain-types/shared';
+import { USER_ROLES, UserRole } from 'src/shared';
+import { UniqueId } from 'src/shared/commonTypes';
 
 export type UserDocument = HydratedDocument<User>;
 
