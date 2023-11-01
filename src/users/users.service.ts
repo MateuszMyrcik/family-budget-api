@@ -9,6 +9,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UniqueId, UserInfoResponse } from 'src/shared';
+import { DeleteResult } from 'mongodb';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +20,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const userExist = await this.userModel.exists({ id: createUserDto.id });
+    const userExist = await this.userModel.exists({ _id: createUserDto._id });
 
     if (userExist) {
       throw new ConflictException('User already exist!');
@@ -54,5 +55,9 @@ export class UsersService {
 
   update(id: UniqueId, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
+  }
+
+  deleteAll(): Promise<DeleteResult> {
+    return this.userModel.deleteMany({}).exec();
   }
 }

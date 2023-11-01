@@ -1,7 +1,7 @@
 import { UniqueId } from 'src/shared';
 
 export class CreateUserDto {
-  readonly id: UniqueId;
+  readonly _id: UniqueId;
 
   readonly nickname: string;
 

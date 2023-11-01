@@ -5,10 +5,10 @@ import { UniqueId } from 'src/shared/commonTypes';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({ _id: false })
 export class User {
-  @Prop({ required: true })
-  id: UniqueId;
+  @Prop({ required: true, type: String })
+  _id: UniqueId; // Using UniqueId (string) for _id
 
   @Prop({ required: true })
   email: string;
