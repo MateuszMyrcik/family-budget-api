@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+
 import { USER_ROLES, UserRole } from 'src/shared';
 import { UniqueId } from 'src/shared/commonTypes';
+import { Household } from 'src/shared/domain/types/household';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -12,6 +14,9 @@ export class User {
 
   @Prop({ required: true })
   email: string;
+
+  @Prop({ default: false })
+  isInvitePending: boolean;
 
   @Prop()
   nickname: string;
@@ -25,8 +30,8 @@ export class User {
   @Prop({ required: true, default: Date.now })
   createdAt: Date;
 
-  @Prop()
-  groupId: UniqueId;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Household' })
+  household: Household;
 
   @Prop()
   avatarUrl: string;

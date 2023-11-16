@@ -1,5 +1,6 @@
 import { USER_ROLES } from '../constants';
 import { UniqueId } from '../../commonTypes';
+import { Household } from './household';
 
 export type UserRole = typeof USER_ROLES[number];
 
@@ -10,10 +11,15 @@ export type User = {
   name?: string;
   surname?: string;
   createdAt: Date;
+  household?: Household;
+  isInvitePending: boolean;
   groupId?: UniqueId;
   avatarUrl?: string;
-  role?: UserRole;
+  role: UserRole;
 };
 
-export type UserInfoResponse = Pick<User, 'id' | 'email' | 'groupId'>;
-export type UserProfileResponse = Omit<User, 'createdAt'>;
+export type GetUserInfoResponse = Pick<
+  User,
+  'id' | 'email' | 'household' | 'isInvitePending' | 'role'
+>;
+export type GetUserProfileResponse = Omit<User, 'createdAt'>;

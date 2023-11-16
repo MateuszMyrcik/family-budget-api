@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { User } from 'src/transactions/user.decorator';
-import { UserRequestInfo } from 'src/transactions/user.type';
+import { User } from 'src/common/user.decorator';
+import { UserRequestInfo } from 'src/common/user.type';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user-info')
@@ -13,13 +12,5 @@ export class UserInfoController {
   @Get()
   findOne(@User() { id }: UserRequestInfo) {
     return this.usersService.findOne(id);
-  }
-
-  @Post()
-  update(
-    @User() { id }: UserRequestInfo,
-    @Body() createUserDto: CreateUserDto,
-  ) {
-    return this.usersService.update(id, createUserDto);
   }
 }
