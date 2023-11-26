@@ -19,6 +19,7 @@ export class TransactionsService {
     createTransactionDto: CreateTransactionDto,
   ): Promise<Transaction> {
     const createdTransaction = new this.transactionModel(createTransactionDto);
+
     return createdTransaction.save();
   }
 
@@ -41,6 +42,10 @@ export class TransactionsService {
     updateTransactionDto: UpdateTransactionDto,
   ): Promise<UpdateResult> {
     return this.transactionModel.updateOne(updateTransactionDto);
+  }
+
+  async resetAll(): Promise<DeleteResult> {
+    return this.transactionModel.deleteMany({});
   }
 
   async remove(id: UniqueId): Promise<DeleteResult> {

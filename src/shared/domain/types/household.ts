@@ -1,4 +1,5 @@
 import { User } from './user';
+import { UniqueId } from '../../commonTypes';
 
 export type Household = {
   name: string;
@@ -9,6 +10,7 @@ export type Household = {
 };
 
 export type Invite = {
+  _id: UniqueId;
   sender: User;
   createdAt: Date;
 };

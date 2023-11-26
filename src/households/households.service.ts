@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { UpdateHouseholdDto } from './dto/update-household.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Household, HouseholdDocument } from './schemas/household.schema';
@@ -6,6 +11,7 @@ import { Model } from 'mongoose';
 import { UniqueId } from 'src/shared';
 import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import { UsersService } from 'src/users/users.service';
+import { ClassificationsService } from 'src/classifications/classifications.service';
 
 @Injectable()
 export class HouseholdsService {
@@ -14,6 +20,8 @@ export class HouseholdsService {
     @InjectModel('Household')
     private householdModel: Model<HouseholdDocument>,
     private userService: UsersService,
+    @Inject(forwardRef(() => ClassificationsService))
+    private classificationService: ClassificationsService,
   ) {}
 
   async create(ownerId: UniqueId) {
@@ -29,6 +37,9 @@ export class HouseholdsService {
     const createdHousehold = new this.householdModel(createHouseholdDto);
 
     await this.userService.updateHousehold(ownerId, createdHousehold._id);
+    await this.classificationService.createDefaultClassification(
+      createdHousehold._id,
+    );
 
     return createdHousehold.save();
   }
@@ -52,9 +63,15 @@ export class HouseholdsService {
       ),
     );
 
-    // if (!household) {
-    //   throw new BadRequestException('Household does not exist');
-    // }
+    return household;
+  }
+
+  async findOneWithValidation(id: UniqueId): Promise<HouseholdDocument> {
+    const household = await this.findOne(id);
+
+    if (!household) {
+      throw new BadRequestException('Household does not exist');
+    }
 
     return household;
   }
@@ -73,6 +90,7 @@ export class HouseholdsService {
       throw new BadRequestException('Household does not exist');
     }
 
+    await this.classificationService.deleteUserClassification(household._id);
     return this.householdModel.deleteOne({ owner: userId });
   }
 
