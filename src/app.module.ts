@@ -6,6 +6,7 @@ import { AuthzModule } from './authz/authz.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UsersModule } from './users/users.module';
 import { HouseholdsModule } from './households/households.module';
+import { ClassificationsModule } from './classifications/classifications.module';
 
 const DB_PASSWORD = process.env.DB_PASSWORD || '';
 
@@ -18,6 +19,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD || '';
     AuthzModule,
     UsersModule,
     HouseholdsModule,
+    ClassificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

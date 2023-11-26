@@ -48,4 +48,9 @@ export class TransactionsController {
   remove(@Param('id') id: UniqueId) {
     return this.transactionsService.remove(id);
   }
+
+  @Delete()
+  resetAll() {
+    return this.transactionsService.resetAll();
+  }
 }
