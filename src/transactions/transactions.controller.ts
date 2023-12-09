@@ -15,6 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from '../common/user.decorator';
 import { UserRequestInfo } from '../common/user.type';
 import { UniqueId } from 'src/shared/commonTypes';
+import { CreateCyclicTransactionDto } from './dto/create-cyclic-transaction.dto';
 
 @Controller('transactions')
 @UseGuards(AuthGuard('jwt'))
@@ -22,18 +23,27 @@ export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
+  createTransaction(@Body() createTransactionDto: CreateTransactionDto) {
+    return this.transactionsService.createTransaction(createTransactionDto);
+  }
+
+  @Post('/cyclic')
+  createCyclicTransaction(
+    @Body() createCyclicTransactionDto: CreateCyclicTransactionDto,
+  ) {
+    return this.transactionsService.createCyclicTransaction(
+      createCyclicTransactionDto,
+    );
   }
 
   @Get()
-  findAll(@User() { id }: UserRequestInfo) {
-    return this.transactionsService.findAll(id);
+  getUserTransactions(@User() { id }: UserRequestInfo) {
+    return this.transactionsService.getUserTransactions(id);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: UniqueId) {
-    return this.transactionsService.findOne(id);
+  getUserTransaction(@Param('id') id: UniqueId) {
+    return this.transactionsService.getUserTransaction(id);
   }
 
   @Patch(':id')
@@ -41,16 +51,16 @@ export class TransactionsController {
     @Param('id') id: UniqueId,
     @Body() updateTransactionDto: UpdateTransactionDto,
   ) {
-    return this.transactionsService.update(id, updateTransactionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: UniqueId) {
-    return this.transactionsService.remove(id);
+    return this.transactionsService.updateTransaction(id, updateTransactionDto);
   }
 
   @Delete()
   resetAll() {
     return this.transactionsService.resetAll();
+  }
+
+  @Delete(':transactionId')
+  removeTransaction(@Param('transactionId') transactionId: UniqueId) {
+    return this.transactionsService.removeTransaction(transactionId);
   }
 }

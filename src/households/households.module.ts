@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Household, HouseholdSchema } from './schemas/household.schema';
 import { UsersModule } from 'src/users/users.module';
 import { ClassificationsModule } from 'src/classifications/classifications.module';
+import { TransactionsModule } from 'src/transactions/transactions.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ClassificationsModule } from 'src/classifications/classifications.modul
     ]),
     UsersModule,
     forwardRef(() => ClassificationsModule),
+    forwardRef(() => TransactionsModule),
   ],
   controllers: [HouseholdsController],
   providers: [HouseholdsService],

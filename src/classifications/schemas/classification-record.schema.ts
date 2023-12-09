@@ -8,10 +8,11 @@ import {
   TransactionType,
 } from 'src/shared';
 
-export type ClassificationDocument = HydratedDocument<Classification>;
+export type ClassificationRecordDocument =
+  HydratedDocument<ClassificationRecord>;
 
 @Schema()
-export class Classification {
+export class ClassificationRecord {
   @Prop({ required: true, enum: CLASSIFICATION_TYPES })
   type: TransactionType;
 
@@ -31,5 +32,5 @@ export class Classification {
   isEditable: boolean;
 }
 
-export const ClassificationSchema =
-  SchemaFactory.createForClass(Classification);
+export const ClassificationRecordSchema =
+  SchemaFactory.createForClass(ClassificationRecord);

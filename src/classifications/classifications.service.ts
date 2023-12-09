@@ -8,11 +8,10 @@ import { CreateClassificationDto } from './dto/create-classification.dto';
 
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Classification,
-  ClassificationDocument,
-} from './schemas/classification.schema';
+  ClassificationRecord,
+  ClassificationRecordDocument,
+} from './schemas/classification-record.schema';
 import { Model } from 'mongoose';
-import { ClassificationGroupCategory } from './schemas/classification-group.schema';
 import {
   ClassificationLabel,
   DEFAULT_CLASSIFICATION_RECORDS,
@@ -25,23 +24,17 @@ import { EMPTY_CLASSIFICATION_LABELS } from './classifications.constants';
 @Injectable()
 export class ClassificationsService {
   constructor(
-    @InjectModel(Classification.name)
-    @InjectModel('Classification')
-    private classificationModel: Model<ClassificationDocument>,
-    @InjectModel(ClassificationGroupCategory.name)
-    @InjectModel('ClassificationGroup')
-    private groupCategoryModel: Model<ClassificationGroupCategory>,
+    @InjectModel(ClassificationRecord.name)
+    @InjectModel('ClassificationRecord')
+    private classificationRecordsModel: Model<ClassificationRecordDocument>,
+
     @Inject(forwardRef(() => HouseholdsService))
     private householdService: HouseholdsService,
   ) {}
 
   async findAll(userId: UniqueId) {
     const householdId = (await this.householdService.findOne(userId))._id;
-    return this.classificationModel.find({ householdId }).exec();
-  }
-
-  async findAllGroups() {
-    return this.groupCategoryModel.find().exec();
+    return this.classificationRecordsModel.find({ householdId }).exec();
   }
 
   async create(
@@ -52,7 +45,7 @@ export class ClassificationsService {
       await this.householdService.findOneWithValidation(userId)
     )._id;
 
-    const classification = await this.classificationModel.findOne({
+    const classification = await this.classificationRecordsModel.findOne({
       'group._id': createClassificationDto.groupId,
     });
 
@@ -64,7 +57,7 @@ export class ClassificationsService {
       () => createClassificationDto.label,
     );
 
-    const createdClassification = new this.classificationModel({
+    const createdClassification = new this.classificationRecordsModel({
       type: classification.type,
       group: classification.group,
       labels: normalizedLabels,
@@ -80,7 +73,7 @@ export class ClassificationsService {
     try {
       const createdRecords = await Promise.all(
         DEFAULT_CLASSIFICATION_RECORDS.map(async (record) => {
-          const classificationRecord = new this.classificationModel({
+          const classificationRecord = new this.classificationRecordsModel({
             ...record,
             householdId,
           });
@@ -96,17 +89,17 @@ export class ClassificationsService {
   }
 
   async deleteUserClassification(householdId: ObjectId): Promise<DeleteResult> {
-    return this.classificationModel.deleteMany({ householdId });
+    return this.classificationRecordsModel.deleteMany({ householdId });
   }
 
   async deleteOne(classificationId: UniqueId): Promise<DeleteResult> {
     const id = new ObjectId(classificationId);
 
-    return this.classificationModel.deleteOne({ _id: id });
+    return this.classificationRecordsModel.deleteOne({ _id: id });
   }
 
   async deleteAll(): Promise<DeleteResult> {
-    return this.classificationModel.deleteMany();
+    return this.classificationRecordsModel.deleteMany();
   }
 
   async updateLabel(
@@ -114,7 +107,7 @@ export class ClassificationsService {
     newLabel: ClassificationLabel,
   ): Promise<any> {
     const id = new ObjectId(classificationId);
-    const classification = await this.classificationModel.findById(id);
+    const classification = await this.classificationRecordsModel.findById(id);
 
     if (!classification) {
       throw new BadRequestException('Classification does not exist');
@@ -129,5 +122,15 @@ export class ClassificationsService {
 
     classification.labels = labels;
     return classification.save();
+  }
+
+  async getClassificationRecord(id: UniqueId): Promise<ClassificationRecord> {
+    const classification = await this.classificationRecordsModel.findById(id);
+
+    if (!classification) {
+      throw new BadRequestException('Classification does not exist');
+    }
+
+    return classification;
   }
 }
