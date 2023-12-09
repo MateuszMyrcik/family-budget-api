@@ -12,6 +12,7 @@ import { UniqueId } from 'src/shared';
 import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import { UsersService } from 'src/users/users.service';
 import { ClassificationsService } from 'src/classifications/classifications.service';
+import { TransactionsService } from 'src/transactions/transactions.service';
 
 @Injectable()
 export class HouseholdsService {
@@ -22,6 +23,8 @@ export class HouseholdsService {
     private userService: UsersService,
     @Inject(forwardRef(() => ClassificationsService))
     private classificationService: ClassificationsService,
+    @Inject(forwardRef(() => TransactionsService))
+    private transactionsService: TransactionsService,
   ) {}
 
   async create(ownerId: UniqueId) {
@@ -76,6 +79,16 @@ export class HouseholdsService {
     return household;
   }
 
+  async getHouseholdIdByUserId(userId: UniqueId): Promise<ObjectId> {
+    const household = await this.findOne(userId);
+
+    if (!household) {
+      throw new BadRequestException('Household does not exist');
+    }
+
+    return household._id;
+  }
+
   async update(
     id: UniqueId,
     updateHouseholdDto: UpdateHouseholdDto,
@@ -91,6 +104,8 @@ export class HouseholdsService {
     }
 
     await this.classificationService.deleteUserClassification(household._id);
+    await this.transactionsService.removeUserTransactions(userId);
+
     return this.householdModel.deleteOne({ owner: userId });
   }
 

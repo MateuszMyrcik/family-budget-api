@@ -1,11 +1,11 @@
-import { Amount, TransactionType } from 'src/shared';
+import { Amount, CreateTransactionRequest, UniqueId } from 'src/shared';
 
-export class CreateTransactionDto {
+export class CreateTransactionDto implements CreateTransactionRequest {
   name: string;
-  date: Date;
-  type: TransactionType;
   amount: Amount;
   comment?: string;
-  categoryId: string;
-  groupCategoryId: string;
+  creatorId: UniqueId;
+  householdId: UniqueId;
+  transactionDate: Date;
+  classificationRecordId: UniqueId;
 }

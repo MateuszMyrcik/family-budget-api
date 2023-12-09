@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import {
   Amount,
+  ClassificationRecord,
   TRANSACTION_TYPES,
   TransactionType,
-  UniqueId,
+  User,
+  Household,
 } from 'src/shared';
 
 export type TransactionDocument = HydratedDocument<Transaction>;
@@ -15,13 +17,23 @@ export class Transaction {
   name: string;
 
   @Prop({ required: true })
-  date: Date;
+  transactionDate: Date;
+
+  @Prop({ required: true })
+  createdAt: Date;
 
   @Prop({ type: Object, required: true })
   amount: Amount;
 
-  @Prop({ type: Object, required: true })
-  creatorId: UniqueId;
+  @Prop({ type: String, required: true, ref: 'User' })
+  creator: User;
+
+  @Prop({
+    required: true,
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Household',
+  })
+  household: Household;
 
   @Prop({ required: false })
   comment?: string;
@@ -29,11 +41,11 @@ export class Transaction {
   @Prop({ required: true, enum: TRANSACTION_TYPES })
   type: TransactionType;
 
-  @Prop({ required: true })
-  categoryId: string;
-
-  @Prop({ required: true })
-  groupCategoryId: string;
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'ClassificationRecord',
+  })
+  classificationRecord: ClassificationRecord;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

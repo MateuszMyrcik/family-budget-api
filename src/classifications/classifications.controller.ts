@@ -45,11 +45,6 @@ export class ClassificationsController {
     return this.classificationsService.deleteAll();
   }
 
-  @Get('groups')
-  findAllGroup() {
-    return this.classificationsService.findAllGroups();
-  }
-
   @Post(':classificationId')
   addLabel(
     @Param('classificationId') classificationId: UniqueId,
