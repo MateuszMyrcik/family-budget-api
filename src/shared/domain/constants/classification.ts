@@ -16,6 +16,18 @@ export type ClassificationGroupKey =
   | 'group-investments'
   | 'group-other-incomes';
 
+export const COLOR_BY_GROUP_ID: Record<ClassificationGroupKey, string> = {
+  'group-shopping': '#F88379',
+  'group-housing': '#E6E6FA',
+  'group-transport': '#B0E0E6',
+  'group-healthcare': '#B2AC88',
+  'group-entertainment': '#DCAE96',
+  'group-other-expenses': '#FFE5B4',
+  'group-salary': '#FFFACD',
+  'group-investments': '#87CEEB',
+  'group-other-incomes': '#98FF98',
+};
+
 export const DEFAULT_CLASSIFICATION_GROUP: Record<
   ClassificationGroupKey,
   ClassificationGroup
@@ -32,7 +44,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Entertainment',
       },
     ],
-    decorationColor: '#DCAE96',
+    decorationColor: COLOR_BY_GROUP_ID['group-entertainment'],
   },
   'group-healthcare': {
     _id: 'group-healthcare',
@@ -46,7 +58,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Healthcare',
       },
     ],
-    decorationColor: '#B2AC88',
+    decorationColor: COLOR_BY_GROUP_ID['group-healthcare'],
   },
   'group-housing': {
     _id: 'group-housing',
@@ -60,7 +72,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Housing',
       },
     ],
-    decorationColor: '#E6E6FA',
+    decorationColor: COLOR_BY_GROUP_ID['group-housing'],
   },
   'group-investments': {
     _id: 'group-investments',
@@ -74,7 +86,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Investments',
       },
     ],
-    decorationColor: '#87CEEB',
+    decorationColor: COLOR_BY_GROUP_ID['group-investments'],
   },
   'group-other-expenses': {
     _id: 'group-other-expenses',
@@ -88,7 +100,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Other expenses',
       },
     ],
-    decorationColor: '#FFE5B4',
+    decorationColor: COLOR_BY_GROUP_ID['group-other-expenses'],
   },
   'group-salary': {
     _id: 'group-salary',
@@ -102,7 +114,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Salary',
       },
     ],
-    decorationColor: '#FFFACD',
+    decorationColor: COLOR_BY_GROUP_ID['group-salary'],
   },
   'group-shopping': {
     _id: 'group-shopping',
@@ -116,7 +128,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Shopping',
       },
     ],
-    decorationColor: '#F88379',
+    decorationColor: COLOR_BY_GROUP_ID['group-shopping'],
   },
   'group-transport': {
     _id: 'group-transport',
@@ -130,8 +142,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Transport',
       },
     ],
-
-    decorationColor: '#B0E0E6',
+    decorationColor: COLOR_BY_GROUP_ID['group-transport'],
   },
   'group-other-incomes': {
     _id: 'group-other-incomes',
@@ -145,7 +156,7 @@ export const DEFAULT_CLASSIFICATION_GROUP: Record<
         value: 'Other incomes',
       },
     ],
-    decorationColor: '#98FF98',
+    decorationColor: COLOR_BY_GROUP_ID['group-other-incomes'],
   },
 };
 
