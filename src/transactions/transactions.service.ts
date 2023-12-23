@@ -15,6 +15,7 @@ import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction, TransactionDocument } from './schemas/transaction.schema';
 import { ClassificationsService } from 'src/classifications/classifications.service';
 import { CreateCyclicTransactionDto } from './dto/create-cyclic-transaction.dto';
+import { HouseholdsService } from 'src/households/households.service';
 
 @Injectable()
 export class TransactionsService {
@@ -24,6 +25,7 @@ export class TransactionsService {
     @Inject(forwardRef(() => ClassificationsService))
     private transactionModel: Model<TransactionDocument>,
     private classificationService: ClassificationsService,
+    private householdService: HouseholdsService,
   ) {}
 
   async createTransaction(
@@ -145,8 +147,11 @@ export class TransactionsService {
   async getUserTransactions(
     userId: UniqueId,
   ): Promise<GetTransactionsResponse> {
+    const userHousehold = await this.householdService.getHouseholdIdByUserId(
+      userId,
+    );
     const findTransactions = await this.transactionModel
-      .find({ creator: userId })
+      .find({ household: userHousehold })
       .populate('classificationRecord')
       .populate('creator')
       .exec();
