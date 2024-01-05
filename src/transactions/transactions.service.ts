@@ -1,6 +1,6 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { DeleteResult, UpdateResult } from 'mongodb';
+import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import { Model } from 'mongoose';
 import {
   Frequency,
@@ -193,6 +193,65 @@ export class TransactionsService {
     };
   }
 
+  async getTransactionsByDateScope(
+    {
+      startDate,
+      endDate,
+    }: {
+      startDate: Date;
+      endDate: Date;
+    },
+    householdId: ObjectId,
+  ): Promise<GetTransactionsResponse> {
+    const findTransactions = await this.transactionModel
+      .find({
+        household: householdId,
+        transactionDate: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      })
+      .populate('classificationRecord')
+      .populate('creator')
+      .exec();
+
+    if (!findTransactions) {
+      return {
+        transactions: [],
+      };
+    }
+
+    const normalizedTransactions = findTransactions.map((transaction) => {
+      const {
+        _id,
+        name,
+        createdAt,
+        amount,
+        comment,
+        classificationRecord,
+        creator,
+        type,
+        transactionDate,
+      } = transaction;
+
+      return {
+        id: _id.toString(),
+        name,
+        transactionDate,
+        createdAt,
+        amount,
+        creator,
+        type,
+        comment,
+        classificationRecord,
+      };
+    });
+
+    return {
+      transactions: normalizedTransactions,
+    };
+  }
+
   async getUserTransaction(id: UniqueId): Promise<Transaction> {
     return this.transactionModel.findOne({ _id: id });
   }
@@ -212,7 +271,10 @@ export class TransactionsService {
     return this.transactionModel.deleteOne({ id: transactionId });
   }
 
-  async removeUserTransactions(userId: UniqueId): Promise<DeleteResult> {
-    return this.transactionModel.deleteMany({ creator: userId });
+  async deleteHouseholdTransactions(userId: UniqueId): Promise<DeleteResult> {
+    const householdId = await this.householdService.getHouseholdIdByUserId(
+      userId,
+    );
+    return this.transactionModel.deleteMany({ household: householdId });
   }
 }

@@ -13,6 +13,7 @@ import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import { UsersService } from 'src/users/users.service';
 import { ClassificationsService } from 'src/classifications/classifications.service';
 import { TransactionsService } from 'src/transactions/transactions.service';
+import { BudgetsService } from 'src/budgets/budgets.service';
 
 @Injectable()
 export class HouseholdsService {
@@ -25,6 +26,8 @@ export class HouseholdsService {
     private classificationService: ClassificationsService,
     @Inject(forwardRef(() => TransactionsService))
     private transactionsService: TransactionsService,
+    @Inject(forwardRef(() => BudgetsService))
+    private budgetsService: BudgetsService,
   ) {}
 
   async create(ownerId: UniqueId) {
@@ -103,8 +106,11 @@ export class HouseholdsService {
       throw new BadRequestException('Household does not exist');
     }
 
-    await this.classificationService.deleteUserClassification(household._id);
-    await this.transactionsService.removeUserTransactions(userId);
+    await this.classificationService.deleteHouseholdClassificationRecords(
+      household._id,
+    );
+    await this.transactionsService.deleteHouseholdTransactions(userId);
+    await this.budgetsService.deleteHouseholdBudget(userId);
 
     return this.householdModel.deleteOne({ owner: userId });
   }

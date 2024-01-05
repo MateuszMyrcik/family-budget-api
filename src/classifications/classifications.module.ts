@@ -8,6 +8,7 @@ import {
 } from './schemas/classification-record.schema';
 
 import { HouseholdsModule } from 'src/households/households.module';
+import { BudgetsModule } from 'src/budgets/budgets.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { HouseholdsModule } from 'src/households/households.module';
       { name: ClassificationRecord.name, schema: ClassificationRecordSchema },
     ]),
     forwardRef(() => HouseholdsModule),
+    forwardRef(() => BudgetsModule),
   ],
   controllers: [ClassificationsController],
   providers: [ClassificationsService],

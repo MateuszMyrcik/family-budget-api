@@ -7,6 +7,7 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { UsersModule } from './users/users.module';
 import { HouseholdsModule } from './households/households.module';
 import { ClassificationsModule } from './classifications/classifications.module';
+import { BudgetsModule } from './budgets/budgets.module';
 
 const DB_PASSWORD = process.env.DB_PASSWORD || '';
 
@@ -20,6 +21,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD || '';
     UsersModule,
     HouseholdsModule,
     ClassificationsModule,
+    BudgetsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

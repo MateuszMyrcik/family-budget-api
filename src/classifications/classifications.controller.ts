@@ -36,8 +36,11 @@ export class ClassificationsController {
   }
 
   @Delete(':classificationId')
-  deleteOne(@Param('classificationId') classificationId: UniqueId) {
-    return this.classificationsService.deleteOne(classificationId);
+  deleteOne(
+    @Param('classificationId') classificationId: UniqueId,
+    @User() { id }: UserRequestInfo,
+  ) {
+    return this.classificationsService.deleteOne(classificationId, id);
   }
 
   @Delete()
@@ -50,7 +53,6 @@ export class ClassificationsController {
     @Param('classificationId') classificationId: UniqueId,
     @Body() dto: UpdateClassificationDto,
   ) {
-    console.log(dto);
     return this.classificationsService.updateLabel(classificationId, dto.label);
   }
 }
