@@ -11,6 +11,7 @@ import {
   ClassificationRecord,
   ClassificationRecordDocument,
 } from './schemas/classification-record.schema';
+import { ClassificationRecord as ClassificationRecordType } from 'src/shared';
 import { Model } from 'mongoose';
 import {
   ClassificationLabel,
@@ -20,6 +21,7 @@ import {
 import { DeleteResult, ObjectId } from 'mongodb';
 import { HouseholdsService } from 'src/households/households.service';
 import { EMPTY_CLASSIFICATION_LABELS } from './classifications.constants';
+import { BudgetsService } from 'src/budgets/budgets.service';
 
 @Injectable()
 export class ClassificationsService {
@@ -30,6 +32,9 @@ export class ClassificationsService {
 
     @Inject(forwardRef(() => HouseholdsService))
     private householdService: HouseholdsService,
+
+    @Inject(forwardRef(() => BudgetsService))
+    private budgetService: BudgetsService,
   ) {}
 
   async findAll(userId: UniqueId) {
@@ -66,6 +71,12 @@ export class ClassificationsService {
       isEditable: true,
     });
 
+    await this.budgetService.syncBudgetsWithClassificationState({
+      householdId,
+      classificationId: createdClassification._id,
+      action: 'ADD',
+    });
+
     return createdClassification.save();
   }
 
@@ -83,18 +94,43 @@ export class ClassificationsService {
 
       return createdRecords;
     } catch (error) {
-      console.error('Error creating default classification records:', error);
       throw error;
     }
   }
 
-  async deleteUserClassification(householdId: ObjectId): Promise<DeleteResult> {
+  async deleteHouseholdClassificationRecords(
+    householdId: ObjectId,
+  ): Promise<DeleteResult> {
     return this.classificationRecordsModel.deleteMany({ householdId });
   }
 
-  async deleteOne(classificationId: UniqueId): Promise<DeleteResult> {
+  async getUserClassifications(
+    householdId: ObjectId,
+  ): Promise<ClassificationRecordType[]> {
+    return this.classificationRecordsModel.find({ householdId });
+  }
+
+  async findOne(id: UniqueId): Promise<ClassificationRecord> {
+    const classification = await this.classificationRecordsModel.findById(id);
+
+    if (!classification) {
+      throw new BadRequestException('Classification does not exist');
+    }
+
+    return classification;
+  }
+
+  async deleteOne(classificationId: UniqueId, userId): Promise<DeleteResult> {
+    const householdId = await this.householdService.getHouseholdIdByUserId(
+      userId,
+    );
     const id = new ObjectId(classificationId);
 
+    await this.budgetService.syncBudgetsWithClassificationState({
+      householdId: householdId,
+      classificationId: id,
+      action: 'REMOVE',
+    });
     return this.classificationRecordsModel.deleteOne({ _id: id });
   }
 

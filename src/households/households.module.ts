@@ -6,6 +6,7 @@ import { Household, HouseholdSchema } from './schemas/household.schema';
 import { UsersModule } from 'src/users/users.module';
 import { ClassificationsModule } from 'src/classifications/classifications.module';
 import { TransactionsModule } from 'src/transactions/transactions.module';
+import { BudgetsModule } from 'src/budgets/budgets.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TransactionsModule } from 'src/transactions/transactions.module';
       { name: Household.name, schema: HouseholdSchema },
     ]),
     UsersModule,
+    forwardRef(() => BudgetsModule),
     forwardRef(() => ClassificationsModule),
     forwardRef(() => TransactionsModule),
   ],

@@ -3,3 +3,4 @@ export * from './user';
 export * from './classification';
 export * from './transaction';
 export * from './household';
+export * from './budget';

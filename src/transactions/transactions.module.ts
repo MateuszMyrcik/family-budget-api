@@ -13,7 +13,7 @@ import { HouseholdsModule } from 'src/households/households.module';
       { name: Transaction.name, schema: TransactionSchema },
     ]),
     UsersModule,
-    HouseholdsModule,
+    forwardRef(() => HouseholdsModule),
     forwardRef(() => ClassificationsModule),
   ],
   controllers: [TransactionsController],

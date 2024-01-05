@@ -28,20 +28,3 @@ export type Image = {
   height?: number;
   url: string;
 };
-
-// BUDGET
-export type Budget = {
-  id: string;
-  year: number;
-  month: number;
-  categoryRecords: BudgetCategoryRecord[];
-};
-
-export type BudgetCategoryRecord = {
-  category: string;
-  groupCategory: string;
-  categoryLabel: string;
-  groupCategoryLabel: string;
-  plannedTotal: number;
-  actualTotal: number;
-};
