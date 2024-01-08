@@ -116,7 +116,7 @@ export class BudgetsService {
 
     const foundRecords = await this.budgetRecordModel
       .find({
-        householdId,
+        household: householdId,
         year,
         month,
       })
@@ -128,7 +128,6 @@ export class BudgetsService {
 
     const mappedRecords = await Promise.all(
       foundRecords.map(async (record) => {
-        console.log('record', record);
         const actualTotal = await this.getClassificationActualTotal({
           classificationId: record.classification._id,
           householdId,
