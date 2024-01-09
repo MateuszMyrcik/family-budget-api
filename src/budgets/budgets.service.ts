@@ -56,7 +56,7 @@ export class BudgetsService {
     );
 
     const found = await this.budgetRecordModel.findOne({
-      householdId,
+      household: householdId,
       year,
       month,
     });
@@ -159,7 +159,7 @@ export class BudgetsService {
 
     const found = await this.budgetRecordModel
       .findOne({
-        householdId,
+        household: householdId,
         _id: dto.recordId,
       })
       .populate('classification');
@@ -214,7 +214,7 @@ export class BudgetsService {
     return await Promise.all(
       periods.map(async (period) => {
         const foundRecord = await this.budgetRecordModel.findOne({
-          householdId,
+          household: householdId,
           classification: classificationId,
           month: period.month,
           year: period.year,
