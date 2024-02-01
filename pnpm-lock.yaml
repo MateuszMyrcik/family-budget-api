@@ -8,7 +8,7 @@ specifiers:
   '@nestjs/devtools-integration': ^0.1.5
   '@nestjs/event-emitter': ^2.0.3
   '@nestjs/mapped-types': '*'
-  '@nestjs/mongoose': ^9.2.1
+  '@nestjs/mongoose': ^10.0.2
   '@nestjs/passport': ^10.0.2
   '@nestjs/platform-express': ^9.2.1
   '@nestjs/schematics': ^9.0.3
@@ -54,7 +54,7 @@ dependencies:
   '@nestjs/devtools-integration': 0.1.5_lrezj43hjafu4otme3rpchrr5a
   '@nestjs/event-emitter': 2.0.3_lrezj43hjafu4otme3rpchrr5a
   '@nestjs/mapped-types': 2.0.4_irztnvdsaite5ifqd6uop3pjdu
-  '@nestjs/mongoose': 9.2.2_dsgpzpm2466mivyabrviqmsafe
+  '@nestjs/mongoose': 10.0.2_dsgpzpm2466mivyabrviqmsafe
   '@nestjs/passport': 10.0.3_5mm334czlt2fbnsorckxzbzizu
   '@nestjs/platform-express': 9.4.3_ah2iaskwxvbibyy3ambonocazi
   axios: 1.6.7
@@ -1564,12 +1564,12 @@ packages:
       reflect-metadata: 0.1.14
     dev: false
 
-  /@nestjs/mongoose/9.2.2_dsgpzpm2466mivyabrviqmsafe:
-    resolution: {integrity: sha512-szNuSUCwwbQSSeiTh8+tZ9fHV4nuzHwBDROb0hX0s7crwY15TunCfwyKbB2XjqkEQWUAasDeCBuKOJSL9N6tTg==}
+  /@nestjs/mongoose/10.0.2_dsgpzpm2466mivyabrviqmsafe:
+    resolution: {integrity: sha512-ITHh075DynjPIaKeJh6WkarS21WXYslu4nrLkNPbWaCP6JfxVAOftaA2X5tPSiiE/gNJWgs+QFWsfCFZUUenow==}
     peerDependencies:
-      '@nestjs/common': ^8.0.0 || ^9.0.0
-      '@nestjs/core': ^8.0.0 || ^9.0.0
-      mongoose: ^6.0.2 || ^7.0.0
+      '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0
+      '@nestjs/core': ^8.0.0 || ^9.0.0 || ^10.0.0
+      mongoose: ^6.0.2 || ^7.0.0 || ^8.0.0
       reflect-metadata: ^0.1.12
       rxjs: ^7.0.0
     dependencies:
