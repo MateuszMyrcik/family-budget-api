@@ -21,5 +21,23 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+
+        "no-eval": "error",
+
+        "unicorn/no-fn-reference-in-iterator": "off",
+        "unicorn/no-array-for-each": "off",
+        "unicorn/no-null": "off",
+        "unicorn/prefer-array-some": "off",
+        "unicorn/consistent-destructuring": "off",
+        "unicorn/no-array-reduce": "off",
+        "unicorn/prefer-spread": "off",
+        "unicorn/no-array-callback-reference": "off",
+
+        "unicorn/consistent-function-scoping": "off",
+        "unicorn/no-useless-undefined": "off",
+        "unicorn/prefer-ternary": "off",
+
+        "unicorn/prefer-node-protocol": "off",
+        "@typescript-eslint/no-unused-vars": "error",
   },
 };

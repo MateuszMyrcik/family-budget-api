@@ -2,15 +2,12 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
   UseGuards,
   Delete,
 } from '@nestjs/common';
 import { HouseholdsService } from './households.service';
 
-import { UpdateHouseholdDto } from './dto/update-household.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/common/user.decorator';
 import { UserRequestInfo } from 'src/common/user.type';
@@ -29,14 +26,6 @@ export class HouseholdsController {
   @Get()
   findOne(@User() { id }: UserRequestInfo) {
     return this.householdsService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateHouseholdDto: UpdateHouseholdDto,
-  ) {
-    return this.householdsService.update(id, updateHouseholdDto);
   }
 
   @Delete()

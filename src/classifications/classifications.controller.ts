@@ -23,24 +23,27 @@ export class ClassificationsController {
   ) {}
 
   @Get()
-  findAll(@User() { id }: UserRequestInfo) {
-    return this.classificationsService.findAll(id);
+  findAll(@User() { householdId }: UserRequestInfo) {
+    return this.classificationsService.findAll(householdId);
   }
 
   @Post()
   create(
     @Body() createClassificationDto: CreateClassificationDto,
-    @User() { id }: UserRequestInfo,
+    @User() { householdId }: UserRequestInfo,
   ) {
-    return this.classificationsService.create(createClassificationDto, id);
+    return this.classificationsService.create(
+      createClassificationDto,
+      householdId,
+    );
   }
 
   @Delete(':classificationId')
   deleteOne(
     @Param('classificationId') classificationId: UniqueId,
-    @User() { id }: UserRequestInfo,
+    @User() { householdId }: UserRequestInfo,
   ) {
-    return this.classificationsService.deleteOne(classificationId, id);
+    return this.classificationsService.deleteOne(classificationId, householdId);
   }
 
   @Delete()

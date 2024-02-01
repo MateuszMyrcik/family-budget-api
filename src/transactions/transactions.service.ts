@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import { Model } from 'mongoose';
@@ -15,17 +15,15 @@ import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction, TransactionDocument } from './schemas/transaction.schema';
 import { ClassificationsService } from 'src/classifications/classifications.service';
 import { CreateCyclicTransactionDto } from './dto/create-cyclic-transaction.dto';
-import { HouseholdsService } from 'src/households/households.service';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TransactionsService {
   constructor(
     @InjectModel(Transaction.name)
     @InjectModel('Transaction')
-    @Inject(forwardRef(() => ClassificationsService))
     private transactionModel: Model<TransactionDocument>,
     private classificationService: ClassificationsService,
-    private householdService: HouseholdsService,
   ) {}
 
   async createTransaction(
@@ -81,7 +79,6 @@ export class TransactionsService {
         break;
       default:
         throw new Error('Invalid frequency');
-        break;
     }
     return transactionDate;
   }
@@ -145,13 +142,10 @@ export class TransactionsService {
   }
 
   async getUserTransactions(
-    userId: UniqueId,
+    householdId: ObjectId,
   ): Promise<GetTransactionsResponse> {
-    const userHousehold = await this.householdService.getHouseholdIdByUserId(
-      userId,
-    );
     const findTransactions = await this.transactionModel
-      .find({ household: userHousehold })
+      .find({ household: householdId })
       .populate('classificationRecord')
       .populate('creator')
       .exec();
@@ -271,10 +265,14 @@ export class TransactionsService {
     return this.transactionModel.deleteOne({ id: transactionId });
   }
 
-  async deleteHouseholdTransactions(userId: UniqueId): Promise<DeleteResult> {
-    const householdId = await this.householdService.getHouseholdIdByUserId(
-      userId,
-    );
+  async deleteHouseholdTransactions(
+    householdId: ObjectId,
+  ): Promise<DeleteResult> {
     return this.transactionModel.deleteMany({ household: householdId });
+  }
+
+  @OnEvent('household.deleted')
+  async handleHouseholdDeletedEvent(householdId: ObjectId) {
+    await this.deleteHouseholdTransactions(householdId);
   }
 }
