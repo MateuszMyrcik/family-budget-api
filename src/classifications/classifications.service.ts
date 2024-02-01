@@ -1,9 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  forwardRef,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateClassificationDto } from './dto/create-classification.dto';
 
 import { InjectModel } from '@nestjs/mongoose';
@@ -19,9 +14,8 @@ import {
   UniqueId,
 } from 'src/shared';
 import { DeleteResult, ObjectId } from 'mongodb';
-import { HouseholdsService } from 'src/households/households.service';
 import { EMPTY_CLASSIFICATION_LABELS } from './classifications.constants';
-import { BudgetsService } from 'src/budgets/budgets.service';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ClassificationsService {
@@ -29,27 +23,17 @@ export class ClassificationsService {
     @InjectModel(ClassificationRecord.name)
     @InjectModel('ClassificationRecord')
     private classificationRecordsModel: Model<ClassificationRecordDocument>,
-
-    @Inject(forwardRef(() => HouseholdsService))
-    private householdService: HouseholdsService,
-
-    @Inject(forwardRef(() => BudgetsService))
-    private budgetService: BudgetsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
-  async findAll(userId: UniqueId) {
-    const householdId = (await this.householdService.findOne(userId))._id;
+  async findAll(householdId: ObjectId) {
     return this.classificationRecordsModel.find({ householdId }).exec();
   }
 
   async create(
     createClassificationDto: CreateClassificationDto,
-    userId: UniqueId,
+    householdId: ObjectId,
   ) {
-    const householdId = (
-      await this.householdService.findOneWithValidation(userId)
-    )._id;
-
     const classification = await this.classificationRecordsModel.findOne({
       'group._id': createClassificationDto.groupId,
     });
@@ -71,13 +55,18 @@ export class ClassificationsService {
       isEditable: true,
     });
 
-    await this.budgetService.syncBudgetsWithClassificationState({
+    this.eventEmitter.emit(
+      'classification.created',
+      createdClassification._id,
       householdId,
-      classificationId: createdClassification._id,
-      action: 'ADD',
-    });
+    );
 
     return createdClassification.save();
+  }
+
+  @OnEvent('household.created')
+  async handleHouseholdCreatedEvent(householdId: ObjectId) {
+    await this.createDefaultClassification(householdId);
   }
 
   async createDefaultClassification(householdId: ObjectId) {
@@ -96,6 +85,11 @@ export class ClassificationsService {
     } catch (error) {
       throw error;
     }
+  }
+
+  @OnEvent('household.deleted')
+  async handleHouseholdDeletedEvent(householdId: ObjectId) {
+    await this.deleteHouseholdClassificationRecords(householdId);
   }
 
   async deleteHouseholdClassificationRecords(
@@ -120,18 +114,19 @@ export class ClassificationsService {
     return classification;
   }
 
-  async deleteOne(classificationId: UniqueId, userId): Promise<DeleteResult> {
-    const householdId = await this.householdService.getHouseholdIdByUserId(
-      userId,
-    );
-    const id = new ObjectId(classificationId);
+  async deleteOne(
+    classificationId: UniqueId,
+    householdId: ObjectId,
+  ): Promise<DeleteResult> {
+    const clarificationId = new ObjectId(classificationId);
 
-    await this.budgetService.syncBudgetsWithClassificationState({
-      householdId: householdId,
-      classificationId: id,
-      action: 'REMOVE',
-    });
-    return this.classificationRecordsModel.deleteOne({ _id: id });
+    this.eventEmitter.emit(
+      'classification.deleted',
+      clarificationId,
+      householdId,
+    );
+
+    return this.classificationRecordsModel.deleteOne({ _id: clarificationId });
   }
 
   async deleteAll(): Promise<DeleteResult> {

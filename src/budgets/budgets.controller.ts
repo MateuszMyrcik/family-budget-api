@@ -20,29 +20,36 @@ export class BudgetsController {
   constructor(private readonly budgetsService: BudgetsService) {}
 
   @Post()
-  createBudget(@Body() dto: CreateBudgetDto, @User() { id }: UserRequestInfo) {
-    return this.budgetsService.createBudget(dto, id);
+  createBudget(
+    @Body() dto: CreateBudgetDto,
+    @User() { id, householdId }: UserRequestInfo,
+  ) {
+    return this.budgetsService.createBudget(dto, id, householdId);
   }
 
   @Get('/:month/:year')
   getPeriodicBudgetRecords(
     @Param('month') month: number,
     @Param('year') year: number,
-    @User() { id }: UserRequestInfo,
+    @User() { id, householdId }: UserRequestInfo,
   ) {
-    return this.budgetsService.getPeriodicBudgetRecords({ month, year }, id);
+    return this.budgetsService.getPeriodicBudgetRecords(
+      { month, year },
+      id,
+      householdId,
+    );
   }
 
   @Post('/records')
   updateBudgetRecord(
     @Body() dto: UpdateBudgetRecordDto,
-    @User() { id }: UserRequestInfo,
+    @User() { id, householdId }: UserRequestInfo,
   ) {
-    return this.budgetsService.updateBudgetRecord(dto, id);
+    return this.budgetsService.updateBudgetRecord(dto, id, householdId);
   }
 
   @Delete()
-  deleteHouseholdBudget(@User() { id }: UserRequestInfo) {
-    return this.budgetsService.deleteHouseholdBudget(id);
+  deleteHouseholdBudget(@User() { householdId }: UserRequestInfo) {
+    return this.budgetsService.deleteHouseholdBudget(householdId);
   }
 }

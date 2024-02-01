@@ -1,8 +1,7 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { BudgetsService } from './budgets.service';
 import { BudgetsController } from './budgets.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { HouseholdsModule } from 'src/households/households.module';
 import { ClassificationsModule } from 'src/classifications/classifications.module';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import {
@@ -15,9 +14,8 @@ import {
     MongooseModule.forFeature([
       { name: BudgetRecord.name, schema: BudgetRecordSchema },
     ]),
-    forwardRef(() => TransactionsModule),
-    forwardRef(() => ClassificationsModule),
-    forwardRef(() => HouseholdsModule),
+    TransactionsModule,
+    ClassificationsModule,
   ],
   controllers: [BudgetsController],
   providers: [BudgetsService],

@@ -55,8 +55,6 @@ export class UsersService {
       })
       .exec();
 
-    // const userWithMembers = await this.userModel
-
     if (!user) {
       throw new NotFoundException('User not found!');
     }

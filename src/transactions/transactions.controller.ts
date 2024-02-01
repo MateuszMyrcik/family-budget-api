@@ -13,9 +13,10 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../common/user.decorator';
-import { UserRequestInfo } from '../common/user.type';
 import { UniqueId } from 'src/shared/commonTypes';
 import { CreateCyclicTransactionDto } from './dto/create-cyclic-transaction.dto';
+
+import { UserRequestInfo } from 'src/common/user.type';
 
 @Controller('transactions')
 @UseGuards(AuthGuard('jwt'))
@@ -37,8 +38,8 @@ export class TransactionsController {
   }
 
   @Get()
-  getUserTransactions(@User() { id }: UserRequestInfo) {
-    return this.transactionsService.getUserTransactions(id);
+  getUserTransactions(@User() { householdId }: UserRequestInfo) {
+    return this.transactionsService.getUserTransactions(householdId);
   }
 
   @Get(':id')

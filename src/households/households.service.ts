@@ -1,19 +1,11 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  forwardRef,
-} from '@nestjs/common';
-import { UpdateHouseholdDto } from './dto/update-household.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Household, HouseholdDocument } from './schemas/household.schema';
 import { Model } from 'mongoose';
 import { UniqueId } from 'src/shared';
 import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import { UsersService } from 'src/users/users.service';
-import { ClassificationsService } from 'src/classifications/classifications.service';
-import { TransactionsService } from 'src/transactions/transactions.service';
-import { BudgetsService } from 'src/budgets/budgets.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class HouseholdsService {
@@ -22,12 +14,7 @@ export class HouseholdsService {
     @InjectModel('Household')
     private householdModel: Model<HouseholdDocument>,
     private userService: UsersService,
-    @Inject(forwardRef(() => ClassificationsService))
-    private classificationService: ClassificationsService,
-    @Inject(forwardRef(() => TransactionsService))
-    private transactionsService: TransactionsService,
-    @Inject(forwardRef(() => BudgetsService))
-    private budgetsService: BudgetsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async create(ownerId: UniqueId) {
@@ -43,9 +30,7 @@ export class HouseholdsService {
     const createdHousehold = new this.householdModel(createHouseholdDto);
 
     await this.userService.updateHousehold(ownerId, createdHousehold._id);
-    await this.classificationService.createDefaultClassification(
-      createdHousehold._id,
-    );
+    this.eventEmitter.emit('household.created', createdHousehold._id);
 
     return createdHousehold.save();
   }
@@ -92,13 +77,6 @@ export class HouseholdsService {
     return household._id;
   }
 
-  async update(
-    id: UniqueId,
-    updateHouseholdDto: UpdateHouseholdDto,
-  ): Promise<UpdateResult> {
-    return this.householdModel.updateOne(updateHouseholdDto);
-  }
-
   async removeHousehold(userId: UniqueId): Promise<DeleteResult> {
     const household = await this.householdModel.findOne({ owner: userId });
 
@@ -106,11 +84,7 @@ export class HouseholdsService {
       throw new BadRequestException('Household does not exist');
     }
 
-    await this.classificationService.deleteHouseholdClassificationRecords(
-      household._id,
-    );
-    await this.transactionsService.deleteHouseholdTransactions(userId);
-    await this.budgetsService.deleteHouseholdBudget(userId);
+    this.eventEmitter.emit('household.removed', household._id);
 
     return this.householdModel.deleteOne({ owner: userId });
   }
@@ -265,7 +239,7 @@ export class HouseholdsService {
   private async validateUserIsOwner(userId: UniqueId) {
     const household = await this.findOne(userId);
 
-    if (household.owner._id !== userId) {
+    if (!household || household.owner._id !== userId) {
       throw new BadRequestException('User is not owner of household');
     }
 

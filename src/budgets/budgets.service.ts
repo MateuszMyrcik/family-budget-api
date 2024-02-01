@@ -1,15 +1,9 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  forwardRef,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateBudgetDto } from './dto/create-budget.dto';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Model } from 'mongoose';
 import { ClassificationsService } from 'src/classifications/classifications.service';
-import { HouseholdsService } from 'src/households/households.service';
 import {
   CreateBudgetResponse,
   GetBudgetResponse,
@@ -24,6 +18,7 @@ import { DeleteResult, ObjectId } from 'mongodb';
 import { BudgetRecord as BudgetRecordSchema } from './schemas/budget-record.schema';
 import { InvalidMonthException } from './exceptions/invalid-month.exceptions';
 import { InvalidYearException } from './exceptions/invalid-year.excetpions';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class BudgetsService {
@@ -31,17 +26,14 @@ export class BudgetsService {
     @InjectModel(BudgetRecordSchema.name)
     @InjectModel('BudgetRecord')
     public budgetRecordModel: Model<BudgetRecordSchema>,
-    @Inject(forwardRef(() => HouseholdsService))
-    private householdService: HouseholdsService,
-    @Inject(forwardRef(() => ClassificationsService))
     private classificationService: ClassificationsService,
-    @Inject(forwardRef(() => TransactionsService))
     private transactionService: TransactionsService,
   ) {}
 
   async createBudget(
     { month, year }: CreateBudgetDto,
     userId: UniqueId,
+    householdId: ObjectId,
   ): Promise<CreateBudgetResponse> {
     if (month < 1 || month > 12) {
       throw new InvalidMonthException();
@@ -50,10 +42,6 @@ export class BudgetsService {
     if (year < 1990 || year > 2050) {
       throw new InvalidYearException();
     }
-
-    const householdId = await this.householdService.getHouseholdIdByUserId(
-      userId,
-    );
 
     const found = await this.budgetRecordModel.findOne({
       household: householdId,
@@ -109,11 +97,8 @@ export class BudgetsService {
   async getPeriodicBudgetRecords(
     { month, year }: GetBudgetDto,
     userId: UniqueId,
+    householdId: ObjectId,
   ): Promise<GetBudgetResponse> {
-    const householdId = await this.householdService.getHouseholdIdByUserId(
-      userId,
-    );
-
     const foundRecords = await this.budgetRecordModel
       .find({
         household: householdId,
@@ -152,11 +137,8 @@ export class BudgetsService {
   async updateBudgetRecord(
     dto: UpdateBudgetRecordDto,
     userId: UniqueId,
+    householdId: ObjectId,
   ): Promise<UpdateBudgetRecordResponse> {
-    const householdId = await this.householdService.getHouseholdIdByUserId(
-      userId,
-    );
-
     const found = await this.budgetRecordModel
       .findOne({
         household: householdId,
@@ -180,6 +162,30 @@ export class BudgetsService {
       year: found.year,
       plannedTotal: found.plannedTotal,
     };
+  }
+
+  @OnEvent('classification.created')
+  async handleClassificationCreatedEvent(
+    classificationId: ObjectId,
+    householdId: ObjectId,
+  ) {
+    await this.syncBudgetsWithClassificationState({
+      action: 'ADD',
+      householdId,
+      classificationId,
+    });
+  }
+
+  @OnEvent('classification.deleted')
+  async handleClassificationDeletedEvent(
+    classificationId: ObjectId,
+    householdId: ObjectId,
+  ) {
+    await this.syncBudgetsWithClassificationState({
+      action: 'REMOVE',
+      householdId,
+      classificationId,
+    });
   }
 
   async syncBudgetsWithClassificationState({
@@ -241,11 +247,12 @@ export class BudgetsService {
     );
   }
 
-  async deleteHouseholdBudget(userId: UniqueId): Promise<DeleteResult> {
-    const householdId = await this.householdService.getHouseholdIdByUserId(
-      userId,
-    );
+  @OnEvent('household.deleted')
+  async handleHouseholdDeletedEvent(householdId: ObjectId) {
+    await this.deleteHouseholdBudget(householdId);
+  }
 
+  async deleteHouseholdBudget(householdId: ObjectId): Promise<DeleteResult> {
     return await this.budgetRecordModel.deleteMany({ householdId });
   }
 
