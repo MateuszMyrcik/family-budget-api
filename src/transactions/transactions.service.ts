@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
 import { Model } from 'mongoose';
@@ -78,7 +82,7 @@ export class TransactionsService {
         }
         break;
       default:
-        throw new Error('Invalid frequency');
+        throw new BadRequestException('Invalid frequency');
     }
     return transactionDate;
   }
@@ -87,15 +91,19 @@ export class TransactionsService {
     createCyclicTransactionDto: CreateCyclicTransactionDto,
   ): Promise<Transaction[]> {
     if (new Date(createCyclicTransactionDto.startDate) < new Date()) {
-      throw new Error('Start date cannot be in the past');
+      throw new BadRequestException('Start date cannot be in the past');
     }
 
     if (createCyclicTransactionDto.occurrences <= MIN_OCCURRENCES) {
-      throw new Error(`Occurrences must be greater than ${MIN_OCCURRENCES}`);
+      throw new BadRequestException(
+        `Occurrences must be greater than ${MIN_OCCURRENCES}`,
+      );
     }
 
     if (createCyclicTransactionDto.occurrences > MAX_OCCURRENCES) {
-      throw new Error(`Occurrences must be less than ${MAX_OCCURRENCES}`);
+      throw new BadRequestException(
+        `Occurrences must be less than ${MAX_OCCURRENCES}`,
+      );
     }
 
     const classificationRecord =
@@ -247,14 +255,28 @@ export class TransactionsService {
   }
 
   async getUserTransaction(id: UniqueId): Promise<Transaction> {
-    return this.transactionModel.findOne({ _id: id });
+    const transaction = await this.transactionModel.findOne({ _id: id });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    return transaction;
   }
 
+  // TODO: Return the updated transaction
   async updateTransaction(
     id: UniqueId,
     updateTransactionDto: UpdateTransactionDto,
   ): Promise<UpdateResult> {
-    return this.transactionModel.updateOne({ _id: id }, updateTransactionDto);
+    await this.ensureTransactionExists(id);
+
+    const updateTransaction = await this.transactionModel.updateOne(
+      { _id: id },
+      updateTransactionDto,
+    );
+
+    return updateTransaction;
   }
 
   async resetAll(): Promise<DeleteResult> {
@@ -262,13 +284,23 @@ export class TransactionsService {
   }
 
   async removeTransaction(transactionId: UniqueId): Promise<DeleteResult> {
-    return this.transactionModel.deleteOne({ id: transactionId });
+    await this.ensureTransactionExists(transactionId);
+
+    return this.transactionModel.deleteOne({ _id: transactionId });
   }
 
   async deleteHouseholdTransactions(
     householdId: ObjectId,
   ): Promise<DeleteResult> {
     return this.transactionModel.deleteMany({ household: householdId });
+  }
+
+  private async ensureTransactionExists(transactionId: UniqueId) {
+    const exists = await this.transactionModel.exists({ _id: transactionId });
+
+    if (!exists) {
+      throw new NotFoundException('Transaction not found');
+    }
   }
 
   @OnEvent('household.deleted')

@@ -2,6 +2,7 @@ import { User } from './user';
 import { UniqueId } from '../../commonTypes';
 
 export type Household = {
+  _id: UniqueId;
   name: string;
   members: User[];
   createdAt: Date;
