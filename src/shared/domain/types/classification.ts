@@ -3,10 +3,10 @@ import {
   CLASSIFICATION_TYPES,
 } from '../constants';
 
-export type ClassificationType = typeof CLASSIFICATION_TYPES[number];
+export type ClassificationType = (typeof CLASSIFICATION_TYPES)[number];
 
 export type ClassificationSupportedLanguage =
-  typeof CLASSIFICATION_SUPPORT_LANGUAGES[number];
+  (typeof CLASSIFICATION_SUPPORT_LANGUAGES)[number];
 
 export type ClassificationLabel = {
   lang: ClassificationSupportedLanguage;
