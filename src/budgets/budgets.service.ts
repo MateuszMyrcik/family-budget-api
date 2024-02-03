@@ -35,6 +35,9 @@ export class BudgetsService {
     userId: UniqueId,
     householdId: ObjectId,
   ): Promise<CreateBudgetResponse> {
+    if (!month || !year) {
+      throw new BadRequestException('Month and year are required');
+    }
     if (month < 1 || month > 12) {
       throw new InvalidMonthException();
     }

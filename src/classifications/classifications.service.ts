@@ -34,11 +34,15 @@ export class ClassificationsService {
     createClassificationDto: CreateClassificationDto,
     householdId: ObjectId,
   ) {
+    if (!Object.keys(createClassificationDto).length) {
+      throw new BadRequestException('Classification data is required');
+    }
+
     const classification = await this.classificationRecordsModel.findOne({
       'group._id': createClassificationDto.groupId,
     });
 
-    if (!classification._id) {
+    if (!classification || !classification._id) {
       throw new BadRequestException('Classification group does not exist');
     }
 
@@ -119,6 +123,15 @@ export class ClassificationsService {
     householdId: ObjectId,
   ): Promise<DeleteResult> {
     const clarificationId = new ObjectId(classificationId);
+    const classification = await this.classificationRecordsModel.findById(
+      clarificationId,
+    );
+
+    if (!classification.isDeletable) {
+      throw new BadRequestException('Classification is not deletable');
+    }
+
+    await this.classificationRecordsModel.deleteOne({ _id: clarificationId });
 
     this.eventEmitter.emit(
       'classification.deleted',
@@ -126,7 +139,7 @@ export class ClassificationsService {
       householdId,
     );
 
-    return this.classificationRecordsModel.deleteOne({ _id: clarificationId });
+    return;
   }
 
   async deleteAll(): Promise<DeleteResult> {
@@ -137,6 +150,10 @@ export class ClassificationsService {
     classificationId: UniqueId,
     newLabel: ClassificationLabel,
   ): Promise<any> {
+    if (!classificationId || !newLabel || !newLabel.lang || !newLabel.value) {
+      throw new BadRequestException('Classification data is required');
+    }
+
     const id = new ObjectId(classificationId);
     const classification = await this.classificationRecordsModel.findById(id);
 
