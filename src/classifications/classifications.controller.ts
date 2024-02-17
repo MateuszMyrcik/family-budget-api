@@ -23,39 +23,40 @@ export class ClassificationsController {
   ) {}
 
   @Get()
-  findAll(@User() { householdId }: UserRequestInfo) {
-    return this.classificationsService.findAll(householdId);
+  findAllClassifications(@User() { householdId }: UserRequestInfo) {
+    return this.classificationsService.findAllClassifications(householdId);
   }
 
   @Post()
-  create(
+  createClassification(
     @Body() createClassificationDto: CreateClassificationDto,
     @User() { householdId }: UserRequestInfo,
   ) {
-    return this.classificationsService.create(
+    return this.classificationsService.createClassification(
       createClassificationDto,
       householdId,
     );
   }
 
   @Delete(':classificationId')
-  deleteOne(
+  deleteClassificationById(
     @Param('classificationId') classificationId: UniqueId,
     @User() { householdId }: UserRequestInfo,
   ) {
-    return this.classificationsService.deleteOne(classificationId, householdId);
-  }
-
-  @Delete()
-  deleteAll() {
-    return this.classificationsService.deleteAll();
+    return this.classificationsService.deleteClassificationById(
+      classificationId,
+      householdId,
+    );
   }
 
   @Post(':classificationId')
-  addLabel(
+  updateClassificationLabel(
     @Param('classificationId') classificationId: UniqueId,
     @Body() dto: UpdateClassificationDto,
   ) {
-    return this.classificationsService.updateLabel(classificationId, dto.label);
+    return this.classificationsService.updateClassificationLabel(
+      classificationId,
+      dto.label,
+    );
   }
 }

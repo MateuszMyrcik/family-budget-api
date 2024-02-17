@@ -17,8 +17,8 @@ export class HouseholdsService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  async create(ownerId: UniqueId) {
-    if (await this.findOne(ownerId)) {
+  async createHousehold(ownerId: UniqueId) {
+    if (await this.findHousehold(ownerId)) {
       throw new BadRequestException('User already has a household');
     }
 
@@ -35,7 +35,7 @@ export class HouseholdsService {
     return createdHousehold.save();
   }
 
-  async findAll() {
+  async findAllHouseholds() {
     const households = await this.householdModel.find().exec();
 
     const populatedHouseholds = await Promise.all(
@@ -47,28 +47,18 @@ export class HouseholdsService {
     return populatedHouseholds;
   }
 
-  async findOne(id: UniqueId): Promise<HouseholdDocument> {
-    const household = await this.findAll().then((households) =>
+  async findHousehold(userId: UniqueId): Promise<HouseholdDocument> {
+    const household = await this.findAllHouseholds().then((households) =>
       households.find((household) =>
-        household.members.some((member) => member._id === id),
+        household.members.some((member) => member._id === userId),
       ),
     );
 
     return household;
   }
 
-  async findOneWithValidation(id: UniqueId): Promise<HouseholdDocument> {
-    const household = await this.findOne(id);
-
-    if (!household) {
-      throw new BadRequestException('Household does not exist');
-    }
-
-    return household;
-  }
-
   async getHouseholdIdByUserId(userId: UniqueId): Promise<ObjectId> {
-    const household = await this.findOne(userId);
+    const household = await this.findHousehold(userId);
 
     if (!household) {
       throw new BadRequestException('Household does not exist');
@@ -77,7 +67,7 @@ export class HouseholdsService {
     return household._id;
   }
 
-  async removeHousehold(userId: UniqueId): Promise<DeleteResult> {
+  async deleteHousehold(userId: UniqueId): Promise<DeleteResult> {
     const household = await this.householdModel.findOne({ owner: userId });
 
     if (!household) {
@@ -89,8 +79,8 @@ export class HouseholdsService {
     return this.householdModel.deleteOne({ owner: userId });
   }
 
-  async sendInvite(userId: UniqueId, ownerEmail: UniqueId) {
-    const households = await this.findAll();
+  async sendHouseholdInvite(userId: UniqueId, ownerEmail: UniqueId) {
+    const households = await this.findAllHouseholds();
 
     const household = households.find(
       (household) => household.owner.email === ownerEmail,
@@ -128,7 +118,7 @@ export class HouseholdsService {
     return this.householdModel.findOne({ _id: household._id });
   }
 
-  async removePendingInvite(
+  async deletePendingInvite(
     inviteId: UniqueId,
     householdId: ObjectId,
   ): Promise<UpdateResult> {
@@ -160,10 +150,10 @@ export class HouseholdsService {
     }
   }
 
-  async declineInvite(userId: UniqueId, inviteId: UniqueId) {
-    const household = await this.findOne(userId);
+  async declineHouseholdInvite(userId: UniqueId, inviteId: UniqueId) {
+    const household = await this.findHousehold(userId);
 
-    await this.validateUserIsOwner(userId);
+    await this.checkUserOwnership(userId);
 
     if (!household.pendingInvites.find((invite) => invite._id === inviteId)) {
       throw new BadRequestException('Invite does not exist');
@@ -173,16 +163,16 @@ export class HouseholdsService {
       (invite) => invite._id === inviteId,
     ).sender;
 
-    await this.removePendingInvite(inviteId, household._id);
+    await this.deletePendingInvite(inviteId, household._id);
     await this.userService.updateInviteStatus(sender._id, false);
 
     return this.householdModel.findById(household._id);
   }
 
-  async acceptInvite(userId: UniqueId, inviteId: UniqueId) {
-    const household = await this.findOne(userId);
+  async acceptHouseholdInvite(userId: UniqueId, inviteId: UniqueId) {
+    const household = await this.findHousehold(userId);
 
-    await this.validateUserIsOwner(userId);
+    await this.checkUserOwnership(userId);
 
     if (!household.pendingInvites.find((invite) => invite._id === inviteId)) {
       throw new BadRequestException('Invite does not exist');
@@ -204,15 +194,15 @@ export class HouseholdsService {
     await this.userService.updateHousehold(sender._id, household._id);
     await this.userService.updateInviteStatus(sender._id, false);
 
-    await this.removePendingInvite(inviteId, household._id);
+    await this.deletePendingInvite(inviteId, household._id);
 
     return this.householdModel.findById(household._id);
   }
 
-  async removeMember(userId: UniqueId, memberId: UniqueId) {
-    const household = await this.findOne(userId);
+  async deleteHouseholdMember(userId: UniqueId, memberId: UniqueId) {
+    const household = await this.findHousehold(userId);
 
-    await this.validateUserIsOwner(userId);
+    await this.checkUserOwnership(userId);
 
     if (!household.members.some((member) => member._id === memberId)) {
       throw new BadRequestException('Member does not exist');
@@ -236,8 +226,8 @@ export class HouseholdsService {
     return this.householdModel.findById(household._id);
   }
 
-  private async validateUserIsOwner(userId: UniqueId) {
-    const household = await this.findOne(userId);
+  private async checkUserOwnership(userId: UniqueId) {
+    const household = await this.findHousehold(userId);
 
     if (!household || household.owner._id !== userId) {
       throw new BadRequestException('User is not owner of household');
