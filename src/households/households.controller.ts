@@ -19,49 +19,49 @@ export class HouseholdsController {
   constructor(private readonly householdsService: HouseholdsService) {}
 
   @Post()
-  create(@User() { id }: UserRequestInfo) {
-    return this.householdsService.create(id);
+  createHousehold(@User() { id }: UserRequestInfo) {
+    return this.householdsService.createHousehold(id);
   }
 
   @Get()
-  findOne(@User() { id }: UserRequestInfo) {
-    return this.householdsService.findOne(id);
+  findHousehold(@User() { id }: UserRequestInfo) {
+    return this.householdsService.findHousehold(id);
   }
 
   @Delete()
-  remove(@User() { id }: UserRequestInfo) {
-    return this.householdsService.removeHousehold(id);
+  deleteHousehold(@User() { id }: UserRequestInfo) {
+    return this.householdsService.deleteHousehold(id);
   }
 
   @Delete('members/:memberId')
-  removeMember(
+  deleteHouseholdMember(
     @User() { id }: GetUserInfoResponse,
     @Param('memberId') memberId: UniqueId,
   ) {
-    return this.householdsService.removeMember(id, memberId);
+    return this.householdsService.deleteHouseholdMember(id, memberId);
   }
 
   @Post('invites/:ownerEmail')
-  invite(
+  sendHouseholdInvite(
     @User() { id }: GetUserInfoResponse,
     @Param('ownerEmail') ownerEmail: string,
   ) {
-    return this.householdsService.sendInvite(id, ownerEmail);
+    return this.householdsService.sendHouseholdInvite(id, ownerEmail);
   }
 
   @Post('invites/accept/:inviteId')
-  acceptInvite(
+  acceptHouseholdInvite(
     @User() { id }: GetUserInfoResponse,
     @Param('inviteId') inviteId: UniqueId,
   ) {
-    return this.householdsService.acceptInvite(id, inviteId);
+    return this.householdsService.acceptHouseholdInvite(id, inviteId);
   }
 
   @Delete('invites/decline/:inviteId')
-  declineInvite(
+  declineHouseholdInvite(
     @User() { id }: GetUserInfoResponse,
     @Param('inviteId') inviteId: UniqueId,
   ) {
-    return this.householdsService.declineInvite(id, inviteId);
+    return this.householdsService.declineHouseholdInvite(id, inviteId);
   }
 }

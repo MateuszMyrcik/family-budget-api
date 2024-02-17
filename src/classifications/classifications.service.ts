@@ -26,11 +26,11 @@ export class ClassificationsService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  async findAll(householdId: ObjectId) {
+  async findAllClassifications(householdId: ObjectId) {
     return this.classificationRecordsModel.find({ householdId }).exec();
   }
 
-  async create(
+  async createClassification(
     createClassificationDto: CreateClassificationDto,
     householdId: ObjectId,
   ) {
@@ -69,11 +69,11 @@ export class ClassificationsService {
   }
 
   @OnEvent('household.created')
-  async handleHouseholdCreatedEvent(householdId: ObjectId) {
-    await this.createDefaultClassification(householdId);
+  async onHouseholdCreate(householdId: ObjectId) {
+    await this.createDefault(householdId);
   }
 
-  async createDefaultClassification(householdId: ObjectId) {
+  async createDefault(householdId: ObjectId) {
     try {
       const createdRecords = await Promise.all(
         DEFAULT_CLASSIFICATION_RECORDS.map(async (record) => {
@@ -92,23 +92,21 @@ export class ClassificationsService {
   }
 
   @OnEvent('household.deleted')
-  async handleHouseholdDeletedEvent(householdId: ObjectId) {
-    await this.deleteHouseholdClassificationRecords(householdId);
+  async onHouseholdDelete(householdId: ObjectId) {
+    await this.deleteClassification(householdId);
   }
 
-  async deleteHouseholdClassificationRecords(
-    householdId: ObjectId,
-  ): Promise<DeleteResult> {
+  async deleteClassification(householdId: ObjectId): Promise<DeleteResult> {
     return this.classificationRecordsModel.deleteMany({ householdId });
   }
 
-  async getUserClassifications(
+  async getClassifications(
     householdId: ObjectId,
   ): Promise<ClassificationRecordType[]> {
     return this.classificationRecordsModel.find({ householdId });
   }
 
-  async findOne(id: UniqueId): Promise<ClassificationRecord> {
+  async findClassificationById(id: UniqueId): Promise<ClassificationRecord> {
     const classification = await this.classificationRecordsModel.findById(id);
 
     if (!classification) {
@@ -118,7 +116,7 @@ export class ClassificationsService {
     return classification;
   }
 
-  async deleteOne(
+  async deleteClassificationById(
     classificationId: UniqueId,
     householdId: ObjectId,
   ): Promise<DeleteResult> {
@@ -142,11 +140,7 @@ export class ClassificationsService {
     return;
   }
 
-  async deleteAll(): Promise<DeleteResult> {
-    return this.classificationRecordsModel.deleteMany();
-  }
-
-  async updateLabel(
+  async updateClassificationLabel(
     classificationId: UniqueId,
     newLabel: ClassificationLabel,
   ): Promise<any> {
@@ -172,7 +166,7 @@ export class ClassificationsService {
     return classification.save();
   }
 
-  async getClassificationRecord(id: UniqueId): Promise<ClassificationRecord> {
+  async getClassification(id: UniqueId): Promise<ClassificationRecord> {
     const classification = await this.classificationRecordsModel.findById(id);
 
     if (!classification) {

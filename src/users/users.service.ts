@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UniqueId, GetUserInfoResponse, USER_ROLE } from 'src/shared';
-import { DeleteResult, ObjectId, UpdateResult } from 'mongodb';
+import { ObjectId, UpdateResult } from 'mongodb';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +18,7 @@ export class UsersService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto) {
     const userExist = await this.userModel.exists({ _id: createUserDto._id });
 
     if (userExist) {
@@ -29,7 +29,7 @@ export class UsersService {
     return createdUser.save();
   }
 
-  async findOne(userId: UniqueId): Promise<GetUserInfoResponse> {
+  async findUser(userId: UniqueId): Promise<GetUserInfoResponse> {
     const user = await this.userModel
       .findById(userId)
       .populate({
@@ -80,10 +80,6 @@ export class UsersService {
     };
   }
 
-  findAll() {
-    return this.userModel.find().exec();
-  }
-
   async updateHousehold(
     userId: UniqueId,
     householdId: ObjectId,
@@ -102,9 +98,5 @@ export class UsersService {
       .findById(userId)
       .updateOne({ isInvitePending })
       .exec();
-  }
-
-  deleteAll(): Promise<DeleteResult> {
-    return this.userModel.deleteMany({}).exec();
   }
 }

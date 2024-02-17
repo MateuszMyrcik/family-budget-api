@@ -11,6 +11,6 @@ export class UserInfoController {
 
   @Get()
   findOne(@User() { id }: UserRequestInfo) {
-    return this.usersService.findOne(id);
+    return this.usersService.findUser(id);
   }
 }

@@ -34,7 +34,7 @@ export class TransactionsService {
     createTransactionDto: CreateTransactionDto,
   ): Promise<Transaction> {
     const classificationRecord =
-      await this.classificationService.getClassificationRecord(
+      await this.classificationService.getClassification(
         createTransactionDto.classificationRecordId,
       );
 
@@ -53,7 +53,7 @@ export class TransactionsService {
     return createdTransaction.save();
   }
 
-  private getTransactionDateByFrequency(
+  private calculateNextTransactionDate(
     startDate: Date,
     frequency: Frequency,
   ): Date {
@@ -107,7 +107,7 @@ export class TransactionsService {
     }
 
     const classificationRecord =
-      await this.classificationService.getClassificationRecord(
+      await this.classificationService.getClassification(
         createCyclicTransactionDto.classificationRecordId,
       );
 
@@ -117,7 +117,7 @@ export class TransactionsService {
     for (let i = 0; i < occurrences; i++) {
       const transactionDate =
         createdTransactions.length > 0
-          ? this.getTransactionDateByFrequency(
+          ? this.calculateNextTransactionDate(
               createdTransactions[createdTransactions.length - 1]
                 .transactionDate,
               frequency,
@@ -141,7 +141,7 @@ export class TransactionsService {
     return this.transactionModel.insertMany(createdTransactions);
   }
 
-  async getAllTransactions(): Promise<Transaction[]> {
+  async findAllTransactions(): Promise<Transaction[]> {
     return this.transactionModel
       .find()
       .populate('classificationRecord')
@@ -149,7 +149,7 @@ export class TransactionsService {
       .exec();
   }
 
-  async getUserTransactions(
+  async getTransactions(
     householdId: ObjectId,
   ): Promise<GetTransactionsResponse> {
     const findTransactions = await this.transactionModel
@@ -195,7 +195,7 @@ export class TransactionsService {
     };
   }
 
-  async getTransactionsByDateScope(
+  async findTransactionsByDate(
     {
       startDate,
       endDate,
@@ -254,7 +254,7 @@ export class TransactionsService {
     };
   }
 
-  async getUserTransaction(id: UniqueId): Promise<Transaction> {
+  async getTransactionById(id: UniqueId): Promise<Transaction> {
     const transaction = await this.transactionModel.findOne({ _id: id });
 
     if (!transaction) {
@@ -265,7 +265,7 @@ export class TransactionsService {
   }
 
   // TODO: Return the updated transaction
-  async updateTransaction(
+  async updateTransactionById(
     id: UniqueId,
     updateTransactionDto: UpdateTransactionDto,
   ): Promise<UpdateResult> {
@@ -279,11 +279,7 @@ export class TransactionsService {
     return updateTransaction;
   }
 
-  async resetAll(): Promise<DeleteResult> {
-    return this.transactionModel.deleteMany({});
-  }
-
-  async removeTransaction(transactionId: UniqueId): Promise<DeleteResult> {
+  async deleteTransaction(transactionId: UniqueId): Promise<DeleteResult> {
     await this.ensureTransactionExists(transactionId);
 
     return this.transactionModel.deleteOne({ _id: transactionId });
@@ -304,7 +300,7 @@ export class TransactionsService {
   }
 
   @OnEvent('household.deleted')
-  async handleHouseholdDeletedEvent(householdId: ObjectId) {
+  async onHouseholdDelete(householdId: ObjectId) {
     await this.deleteHouseholdTransactions(householdId);
   }
 }

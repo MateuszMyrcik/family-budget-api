@@ -31,25 +31,24 @@ export class BudgetsController {
   getPeriodicBudgetRecords(
     @Param('month') month: number,
     @Param('year') year: number,
-    @User() { id, householdId }: UserRequestInfo,
+    @User() { householdId }: UserRequestInfo,
   ) {
-    return this.budgetsService.getPeriodicBudgetRecords(
+    return this.budgetsService.getBudgetRecordsForPeriod(
       { month, year },
-      id,
       householdId,
     );
   }
 
   @Post('/records')
-  updateBudgetRecord(
+  addBudgetRecord(
     @Body() dto: UpdateBudgetRecordDto,
-    @User() { id, householdId }: UserRequestInfo,
+    @User() { householdId }: UserRequestInfo,
   ) {
-    return this.budgetsService.updateBudgetRecord(dto, id, householdId);
+    return this.budgetsService.addBudgetRecord(dto, householdId);
   }
 
   @Delete()
   deleteHouseholdBudget(@User() { householdId }: UserRequestInfo) {
-    return this.budgetsService.deleteHouseholdBudget(householdId);
+    return this.budgetsService.deleteBudgetById(householdId);
   }
 }

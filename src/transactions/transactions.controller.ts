@@ -23,6 +23,10 @@ import { UserRequestInfo } from 'src/common/user.type';
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
+  @Get()
+  getTransactions(@User() { householdId }: UserRequestInfo) {
+    return this.transactionsService.getTransactions(householdId);
+  }
   @Post()
   createTransaction(@Body() createTransactionDto: CreateTransactionDto) {
     return this.transactionsService.createTransaction(createTransactionDto);
@@ -37,31 +41,24 @@ export class TransactionsController {
     );
   }
 
-  @Get()
-  getUserTransactions(@User() { householdId }: UserRequestInfo) {
-    return this.transactionsService.getUserTransactions(householdId);
-  }
-
   @Get(':id')
-  getUserTransaction(@Param('id') id: UniqueId) {
-    return this.transactionsService.getUserTransaction(id);
+  getTransactionById(@Param('id') id: UniqueId) {
+    return this.transactionsService.getTransactionById(id);
   }
 
   @Patch(':id')
-  update(
+  updateTransactionById(
     @Param('id') id: UniqueId,
     @Body() updateTransactionDto: UpdateTransactionDto,
   ) {
-    return this.transactionsService.updateTransaction(id, updateTransactionDto);
-  }
-
-  @Delete()
-  resetAll() {
-    return this.transactionsService.resetAll();
+    return this.transactionsService.updateTransactionById(
+      id,
+      updateTransactionDto,
+    );
   }
 
   @Delete(':transactionId')
-  removeTransaction(@Param('transactionId') transactionId: UniqueId) {
-    return this.transactionsService.removeTransaction(transactionId);
+  deleteTransaction(@Param('transactionId') transactionId: UniqueId) {
+    return this.transactionsService.deleteTransaction(transactionId);
   }
 }

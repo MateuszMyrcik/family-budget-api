@@ -57,7 +57,7 @@ export class BudgetsService {
     }
 
     const classificationRecords = (
-      await this.classificationService.getUserClassifications(householdId)
+      await this.classificationService.getClassifications(householdId)
     ).filter((classification) => classification.type === 'EXPENSE');
 
     const createdRecords = await Promise.all(
@@ -97,9 +97,8 @@ export class BudgetsService {
     });
   }
 
-  async getPeriodicBudgetRecords(
+  async getBudgetRecordsForPeriod(
     { month, year }: GetBudgetDto,
-    userId: UniqueId,
     householdId: ObjectId,
   ): Promise<GetBudgetResponse> {
     const foundRecords = await this.budgetRecordModel
@@ -137,9 +136,8 @@ export class BudgetsService {
     return mappedRecords;
   }
 
-  async updateBudgetRecord(
+  async addBudgetRecord(
     dto: UpdateBudgetRecordDto,
-    userId: UniqueId,
     householdId: ObjectId,
   ): Promise<UpdateBudgetRecordResponse> {
     const found = await this.budgetRecordModel
@@ -168,7 +166,7 @@ export class BudgetsService {
   }
 
   @OnEvent('classification.created')
-  async handleClassificationCreatedEvent(
+  async onClassificationCreate(
     classificationId: ObjectId,
     householdId: ObjectId,
   ) {
@@ -252,10 +250,10 @@ export class BudgetsService {
 
   @OnEvent('household.deleted')
   async handleHouseholdDeletedEvent(householdId: ObjectId) {
-    await this.deleteHouseholdBudget(householdId);
+    await this.deleteBudgetById(householdId);
   }
 
-  async deleteHouseholdBudget(householdId: ObjectId): Promise<DeleteResult> {
+  async deleteBudgetById(householdId: ObjectId): Promise<DeleteResult> {
     return await this.budgetRecordModel.deleteMany({ householdId });
   }
 
@@ -271,7 +269,7 @@ export class BudgetsService {
     month: number;
   }) {
     const { transactions } =
-      await this.transactionService.getTransactionsByDateScope(
+      await this.transactionService.findTransactionsByDate(
         {
           startDate: new Date(year, month - 1, 1),
           endDate: new Date(year, month, 0),
