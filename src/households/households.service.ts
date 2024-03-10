@@ -83,7 +83,7 @@ export class HouseholdsService {
     const households = await this.findAllHouseholds();
 
     const household = households.find(
-      (household) => household.owner.email === ownerEmail,
+      (household) => household?.owner?.email === ownerEmail,
     );
 
     if (!household) {

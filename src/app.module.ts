@@ -8,7 +8,7 @@ import { UsersModule } from './users/users.module';
 import { HouseholdsModule } from './households/households.module';
 import { ClassificationsModule } from './classifications/classifications.module';
 import { BudgetsModule } from './budgets/budgets.module';
-import { DevtoolsModule } from '@nestjs/devtools-integration';
+// import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { HouseholdsInterceptor } from './households/households.interceptor';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -22,9 +22,9 @@ const modules = [
   HouseholdsModule,
   ClassificationsModule,
   BudgetsModule,
-  DevtoolsModule.register({
-    http: process.env.NODE_ENV !== 'production',
-  }),
+  // DevtoolsModule.register({
+  //   http: process.env.NODE_ENV !== 'production',
+  // }),
   EventEmitterModule.forRoot(),
 ];
 
